@@ -89,7 +89,9 @@
 \institute[GSoC]
 {
 Google Summer of Code 2016
-
+\\
+Head of the operation: Ian Romanick
+\\
 \medskip
 \textit{tournier.elie@gmail.com}
 }
@@ -118,9 +120,9 @@ Google Summer of Code 2016
 \frametitle{Who am I?}
 \begin{itemize}
 \item Elie Tournier
-\item Graduate Software and Image Processing Engineer
 \item Google Summer of Code 2016 Student
-\item Available for hire !
+\item Graduate Software and Image Processing Engineer
+\item Available for hire
 \end{itemize}
 \end{frame}
 
@@ -131,18 +133,9 @@ Google Summer of Code 2016
 \begin{frame}
 \frametitle{Goal}
 \begin{itemize}
-\item Create GL\_ARB\_gpu\_shader\_fp64 for GPU before OpenGL 4.0 compatibility.
-\item So we need double precision support.
-\end{itemize}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Constraints}
-\begin{itemize}
-\item The license should be compatible with Mesa.
-\item IEEE 754 compliant.
+\item Iago Toral bring GL\_ARB\_gpu\_shader\_fp64 to Intel GPUs.
+\item A stretch goal would be to create GL\_ARB\_gpu\_shader\_fp64 for GPUs without FP64 hardware support.
+\item Create a FP64 support
 \end{itemize}
 \end{frame}
 
@@ -151,11 +144,24 @@ Google Summer of Code 2016
 %------------------------------------------------
 
 \begin{frame}
+\frametitle{GLSL}
+\begin{itemize}
+\item The library is written in GLSL.
+\item Use GLSL in order to use the graphics pipeline without having to use hardware-specific languages.
+\item Can be convert to GLSL IR thanks to the standalone compiler.
+\item Like I need to use bitwise operators, GPUs must be GLSL 1.30 (OpenGL 3.0).
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
 \frametitle{Choose a CPU lib}
 \begin{itemize}
-\item We don't want to reinventing the wheel.
+\item I don't want to reinvent the wheel.
 \item Convert a CPU library to a GPU one.
-\item Berkeley SoftFloat from John R. Hauser
+\item Berkeley SoftFloat by John R. Hauser.
+\item IEEE 754 compliant.
 \end{itemize}
 \end{frame}
 
@@ -166,34 +172,75 @@ Google Summer of Code 2016
 \begin{frame}
 \frametitle{Dev environment}
 \begin{itemize}
-\item Use Shader\_runner from Piglit
-\item Store fp64 in uvec2().
+\item Code in my GitHub.
+\item Use Shader\_runner from Piglit.
+\item Debug and test shaders.
 \end{itemize}
 \end{frame}
 
 %------------------------------------------------
 
 \begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-\frametitle{Code Example}
-\begin{example}[Code softfloat]
+\frametitle{Store FP64}
+\begin{example}[Code Berkley SoftFloat]
 \begin{verbatim}
-int main(){
-  return 0;
+typedef struct {
+   !!!bits32 high, low;
+} float64;
+\end{verbatim}
+\end{example}
+
+\begin{example}[Code libSoftFloat]
+\begin{verbatim}
+uvec2 fp64;
+\end{verbatim}
+\end{example}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
+\frametitle{Extract FP64 Exp}
+\begin{example}[Code Berkley SoftFloat]
+\begin{verbatim}
+INLINE int16 extractFloat64Exp( float64 a )
+{
+
+    return ( a.high>>20 ) & 0x7FF;
+
 }
 \end{verbatim}
 \end{example}
 
-\frametitle{Verbatim}
 \begin{example}[Code libSoftFloat]
 \begin{verbatim}
-int main(){
-  return 0;
+uint extractFloat64Exp( uvec2 a )
+{
+
+    return ( a.x>>20 ) & 0x7FFu;
+    
 }
 \end{verbatim}
 \end{example}
 
 \end{frame}
 
+%------------------------------------------------
+\section{Plan}
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Plan}
+\begin{itemize}
+\item Finish to implement last FP64 operations.
+\item Integrate the lib to Mesa.
+\item Implement GL\_ARB\_gpu\_shader\_fp64.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{References}
 %------------------------------------------------
 
 \begin{frame}
